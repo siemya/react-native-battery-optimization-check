@@ -14,7 +14,7 @@ export function BatteryOptEnabled() {
 export function RequestDisableOptimization() {
   if (Platform.OS === 'android') {
     //* Android only returns function
-    BatteryOptimizationCheck.openRequestDisableOptimization();
+    return BatteryOptimizationCheck.openRequestDisableOptimization();
   }
   return;
 }
