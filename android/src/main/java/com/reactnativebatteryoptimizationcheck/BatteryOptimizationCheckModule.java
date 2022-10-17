@@ -33,7 +33,7 @@ public class BatteryOptimizationCheckModule extends ReactContextBaseJavaModule {
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent intent) {
             if(requestCode == BATTERY_OPT_MODAL_REQUEST) {
                 Log.v("ReactNative","blaaaa");
-                mPromise.resolve("5"); 
+                mPromise.resolve("6"); 
                 mPromise = null;
             }
         }
