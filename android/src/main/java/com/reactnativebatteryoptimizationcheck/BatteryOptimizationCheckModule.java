@@ -25,6 +25,8 @@ public class BatteryOptimizationCheckModule extends ReactContextBaseJavaModule {
     public static final String NAME = "BatteryOptimizationCheck";
 
     private static final int BATTERY_OPT_MODAL_REQUEST = 1;
+    private static final String OPT_ENABLED = "enabled";
+    private static final String OPT_DISABLED = "disabled";
 
     private final ReactApplicationContext reactContext;
     private Promise mPromise;
@@ -32,8 +34,7 @@ public class BatteryOptimizationCheckModule extends ReactContextBaseJavaModule {
     private final ActivityEventListener mActivityEventListener = new BaseActivityEventListener() { 
         public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent intent) {
             if(requestCode == BATTERY_OPT_MODAL_REQUEST) {
-                Log.v("ReactNative","blaaaa");
-                mPromise.resolve("6"); 
+                mPromise.resolve(resultCode == 0 ? OPT_ENABLED : OPT_DISABLED); 
                 mPromise = null;
             }
         }
@@ -67,15 +68,22 @@ public class BatteryOptimizationCheckModule extends ReactContextBaseJavaModule {
     @SuppressLint("BatteryLife")
     @ReactMethod
     public void openRequestDisableOptimization(Promise promise) {
+        mPromise = promise;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Activity currentActivity = getCurrentActivity();
-            mPromise = promise;
             String packageName = reactContext.getPackageName();
-            Intent intent = new Intent();
-            intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-            intent.setData(Uri.parse("package:" + packageName));
-            //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            currentActivity.startActivityForResult(intent,BATTERY_OPT_MODAL_REQUEST);
+            PowerManager pm = (PowerManager) reactContext.getSystemService(Context.POWER_SERVICE);
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                Activity currentActivity = getCurrentActivity();
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                intent.setData(Uri.parse("package:" + packageName));
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                currentActivity.startActivityForResult(intent,BATTERY_OPT_MODAL_REQUEST);
+            } else {
+                mPromise.resolve(OPT_DISABLED);
+            }
+        } else {
+            mPromise.resolve(OPT_DISABLED);
         }
     }
 
