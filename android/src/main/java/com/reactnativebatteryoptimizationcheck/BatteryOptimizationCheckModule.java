@@ -77,7 +77,6 @@ public class BatteryOptimizationCheckModule extends ReactContextBaseJavaModule {
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
                 intent.setData(Uri.parse("package:" + packageName));
-                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 currentActivity.startActivityForResult(intent,BATTERY_OPT_MODAL_REQUEST);
             } else {
                 mPromise.resolve(OPT_DISABLED);
